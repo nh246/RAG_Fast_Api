@@ -31,3 +31,24 @@ A production-grade Retrieval-Augmented Generation (RAG) system built over the Fa
 ### Run the Pipeline
 ```bash
 python src/ingest.py
+
+## Day 2 — Embeddings + Vector Store
+
+**Model:** all-MiniLM-L6-v2 (free, local, ONNX via ChromaDB's default embedding function).
+**Why:** no GPU on my machine, $0 cost, and MiniLM (~90 MB) is strong enough for a
+single-topic technical corpus. I'll upgrade to OpenAI text-embedding-3-small ONLY if
+Day 5 evals show retrieval quality is the bottleneck.
+
+**Pipeline:** src/embed.py loads Day 1's chunks.json, embeds each chunk (384-dim
+vectors), and stores text + vector + metadata (source, chunk_index) into a local
+ChromaDB collection `fastapi_docs` (data/chroma_db).
+
+**Results:** 2,476 chunks embedded + stored. Run time: ~X min on CPU.
+(Local note: chromadb's ONNX model cache patched to E: drive — C: drive is full.)
+
+**Retrieval:** src/retrieve.py embeds the query with the SAME model and returns
+top-k (k=5) chunks ranked by distance.
+
+**10-query sanity check (src/sanity_check.py):**
+- Strong hits: dependency injection, CORS, OAuth2, JSON responses, deploy,
+  background tasks, request validation ✅
